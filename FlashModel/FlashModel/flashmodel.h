@@ -8,6 +8,8 @@
 
 // When this is enabled, an exception will be thrown if pico interrupts are not disabled before flash program or erase.
 #define REQUIRE_DISABLED_INTERRUPT 1
+// use memset instead of looping byte-by-byte and bitwise & for slight speed improvement
+#define FAST_FLASH 0
 
 // parameters, Change these how you want for testing. These are currently reduced from the actual sizes on the Pico (W).
 // Pico W has page: (1u << 8) == 256u, sector: (1u << 12) == 4096u. We have less for testing.

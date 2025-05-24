@@ -33,8 +33,14 @@ void flash_range_program(uint32_t flash_offs, const uint8_t* data, size_t count)
 		throw std::runtime_error("Interrupts are enabled while programming flash!");
 	}
 #endif
-	
+
+#if FAST_FLASH
 	memcpy(FLASH_MODEL + flash_offs, data, count);
+#else
+	for (size_t i = 0; i < count; i++) {
+		FLASH_MODEL[flash_offs + count] &= data[i];
+	}
+#endif
 }
 
 void flash_range_erase(uint32_t flash_offs, size_t count)
@@ -48,7 +54,7 @@ void flash_range_erase(uint32_t flash_offs, size_t count)
 	if (flash_offs + count > sizeof(FLASH_MODEL)) {
 		throw std::invalid_argument("Out of bounds for flash: offset " + std::to_string(flash_offs) + ", size " + std::to_string(count));
 	}
-#ifdef REQUIRE_DISABLED_INTERRUPT
+#if REQUIRE_DISABLED_INTERRUPT
 	if (interrupts_enabled) {
 		throw std::runtime_error("Interrupts are enabled while erasing flash!");
 	}
