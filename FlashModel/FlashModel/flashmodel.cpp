@@ -5,6 +5,7 @@
 
 // allocate memory for flash
 static uint8_t FLASH_MODEL[PICO_FLASH_SIZE_BYTES];
+static bool interrupts_enabled = 1;
 
 void FlashModelInit()
 {
@@ -27,6 +28,11 @@ void flash_range_program(uint32_t flash_offs, const uint8_t* data, size_t count)
 	if (flash_offs + count > sizeof(FLASH_MODEL)) {
 		throw std::invalid_argument("Out of bounds for flash: offset " + std::to_string(flash_offs) + ", size " + std::to_string(count));
 	}
+#ifdef REQUIRE_DISABLED_INTERRUPT
+	if (interrupts_enabled) {
+		throw std::runtime_error("Interrupts are enabled while programming flash!");
+	}
+#endif
 	
 	memcpy(FLASH_MODEL + flash_offs, data, count);
 }
@@ -42,7 +48,21 @@ void flash_range_erase(uint32_t flash_offs, size_t count)
 	if (flash_offs + count > sizeof(FLASH_MODEL)) {
 		throw std::invalid_argument("Out of bounds for flash: offset " + std::to_string(flash_offs) + ", size " + std::to_string(count));
 	}
+#ifdef REQUIRE_DISABLED_INTERRUPT
+	if (interrupts_enabled) {
+		throw std::runtime_error("Interrupts are enabled while erasing flash!");
+	}
+#endif
 
 	memset(FLASH_MODEL + flash_offs, 0xFF, count);
 }
 
+uint32_t save_and_disable_interrupts()
+{
+	interrupts_enabled = 0;
+	return 1;
+}
+void restore_interrupts(uint32_t interrupts)
+{
+	interrupts_enabled = 1;
+}
