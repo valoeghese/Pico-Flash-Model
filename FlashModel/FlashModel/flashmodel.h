@@ -19,13 +19,16 @@
 // Pico W has 2MiB. We have smaller for testing (especially because it is statically allocated).
 #define PICO_FLASH_SIZE_BYTES (1 * 1024) // 1 KiB
 
-#define XIP_BASE ((uint32_t)FlashBasePtr())
+#define XIP_BASE ((uintptr_t)FlashBasePtr())
 
 // Initialise the flash model (set everything to 1)
 void FlashModelInit();
 
 // Get the base pointer to flash.
 void *FlashBasePtr();
+
+// Debug: print all bytes of a given page to standard output.
+void FlashModelDumpPage(uint32_t flash_offs);
 
 // Define the Pico W's interface for flash.
 

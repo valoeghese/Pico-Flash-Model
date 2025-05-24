@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdexcept>
 #include <string>
+#include <stdio.h>
 
 // allocate memory for flash
 static uint8_t FLASH_MODEL[PICO_FLASH_SIZE_BYTES];
@@ -10,6 +11,22 @@ static bool interrupts_enabled = 1;
 void FlashModelInit()
 {
 	memset(FLASH_MODEL, 0xFF, sizeof(FLASH_MODEL));
+}
+
+void FlashModelDumpPage(uint32_t flash_offs)
+{
+	if (flash_offs & (FLASH_PAGE_SIZE - 1)) {
+		throw std::invalid_argument("Flash Offset must be a multiple of page. got " + std::to_string(flash_offs));
+	}
+	if ((uintptr_t)flash_offs + FLASH_PAGE_SIZE > sizeof(FLASH_MODEL)) {
+		throw std::invalid_argument("Out of bounds for flash: offset " + std::to_string(flash_offs));
+	}
+
+	for (size_t i = 0; i < FLASH_PAGE_SIZE; i++) {
+		printf("%02x ", FLASH_MODEL[flash_offs + i]);
+		if ((i & 15) == 15)
+			printf("\n");
+	}
 }
 
 void *FlashBasePtr()
