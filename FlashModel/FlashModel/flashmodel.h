@@ -1,6 +1,9 @@
 #pragma once
 
-// parameters, change these if you want
+// This should work for modelling Pico and all pico-derived microcontroller's flash.
+// Should also be easily adaptable to microcontrollers with a similar api.
+
+// parameters, Change these how you want for testing. These are currently reduced from the actual sizes on the Pico (W).
 // Pico W has page: (1u << 8) == 256u, sector: (1u << 12) == 4096u. We have less for testing.
 #define FLASH_PAGE_SIZE (1u << 6)        // 64u
 #define FLASH_SECTOR_SIZE (1u << 8)      // 256u
@@ -8,3 +11,21 @@
 // Pico W has 2MiB. We have smaller for testing (especially because it is statically allocated).
 #define PICO_FLASH_SIZE_BYTES (1 * 1024) // 1 KiB
 
+#define XIP_BASE (FlashBasePtr())
+
+// Initialise the flash model (set everything to 1)
+void FlashModelInit();
+
+// Get the base pointer to flash.
+void *FlashBasePtr();
+
+// Define the Pico W's interface for flash.
+
+// @param flash_offs The offset into flash to write. This must be a multiple of one page.
+// @param data Pointer to the data to write.
+// @param count The number of bytes to write. This must be a multiple of one page.
+void flash_range_program(uint32_t flash_offs, const uint8_t* data, size_t count);
+
+// @param flash_offs The offset into flash to erase. This must be a multiple of one sector.
+// @param count The number of bytes to erase. This must be a multiple of one sector.
+void flash_range_erase(uint32_t flash_offs, size_t count);
