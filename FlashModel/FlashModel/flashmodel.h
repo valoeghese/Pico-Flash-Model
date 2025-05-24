@@ -8,16 +8,20 @@
 
 // When this is enabled, an exception will be thrown if pico interrupts are not disabled before flash program or erase.
 #define REQUIRE_DISABLED_INTERRUPT 1
-// use memset instead of looping byte-by-byte and bitwise & for slight speed improvement
+// use memset instead of looping byte-by-byte with bitwise & for slight speed improvement. less accurate to real flash program behaviour
 #define FAST_FLASH 0
 
-// parameters, Change these how you want for testing. These are currently reduced from the actual sizes on the Pico (W).
-// Pico W has page: (1u << 8) == 256u, sector: (1u << 12) == 4096u. We have less for testing.
-#define FLASH_PAGE_SIZE (1u << 6)        // 64u
-#define FLASH_SECTOR_SIZE (1u << 8)      // 256u
-
-// Pico W has 2MiB. We have smaller for testing (especially because it is statically allocated).
-#define PICO_FLASH_SIZE_BYTES (1 * 1024) // 1 KiB
+// parameters, Change these how you want for testing by setting defines.
+// I recommend reducing from the actual sizes on the Pico (W) if you want to use less / more constrained memory for testing.
+#ifndef FLASH_PAGE_SIZE
+	#define FLASH_PAGE_SIZE (1u << 8)        // 256u
+#endif
+#ifndef FLASH_SECTOR_SIZE
+	#define FLASH_SECTOR_SIZE (1u << 12)      // 4096u
+#endif
+#ifndef PICO_FLASH_SIZE_BYTES
+	#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024) // 2 MiB
+#endif
 
 #define XIP_BASE ((uintptr_t)FlashBasePtr())
 
