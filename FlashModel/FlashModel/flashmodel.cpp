@@ -55,7 +55,7 @@ void flash_range_program(uint32_t flash_offs, const uint8_t* data, size_t count)
 	memcpy(FLASH_MODEL + flash_offs, data, count);
 #else
 	for (size_t i = 0; i < count; i++) {
-		FLASH_MODEL[flash_offs + count] &= data[i];
+		FLASH_MODEL[flash_offs + i] &= data[i];
 	}
 #endif
 }
